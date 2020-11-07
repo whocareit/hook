@@ -25,7 +25,9 @@ function App() {
     return (
         <div>
             <p>you click {count} times</p>
-            <button onClick={() => setCount(count + 1)}>click</button>
+            {/* <button onClick={() => setCount(count + 1)}>click</button> */}
+            <button onClick={() => setCount(prevCount => prevCount - 1)}>-</button>
+            <button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
         </div>
     )
 }
@@ -48,6 +50,21 @@ function App() {
 //             </div>
 //         )
 //     }
+// }
+
+// const thems  = {
+//     light: {
+//         foreground: '#000',
+//         background: "#eee"
+//     },
+//     drak: {
+
+//     }
+// }
+// function App() {
+//     return (
+//         <ThemeContext.Provider value={thems.dark}></ThemeContext.Provider>
+//     )
 // }
 
 export default App
