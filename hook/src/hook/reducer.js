@@ -15,14 +15,21 @@ import { useState  } from 'react';
 //     return isOnline;
 // }
 //reducer的hook
-function useReducer(reducer, initialState){
-    //初始化state的值
-    const [ state, setState ] = useState(initialState);
+// function useReducer(reducer, initialState){
+//     //初始化state的值
+//     const [ state, setState ] = useState(initialState);
 
-        function dispatch(action) {
-            const nextState = reducer(state, action);
-            setState(nextState);
-        }
-    return [ state,dispatch ];
+//         function dispatch(action) {
+//             const nextState = reducer(state, action);
+//             setState(nextState);
+//         }
+//     return [ state,dispatch ];
+// }
+export default function useReducer(reducer, initialState) {
+    const [ state, setState ] = useState(initialState);
+    function dispatch(action){
+        const nextState = reducer(state, action);
+        return setState(nextState);
+    } 
+    return [state, dispatch]
 }
-export default useReducer;

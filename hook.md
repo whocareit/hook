@@ -44,16 +44,64 @@ hook需要遵循的两条规则：
 注意： 如果要使用这个优化的方式，需要确保数组包含了所有外部作用域中会发发生变化，且在effect中使用的变量。如果只想运行一次effect，可以传递一个空数组作为第二个参数。
 * useContext
 1. 用法： const value = useContext(MyContext);
-2. 描述：接收一个Context对象，并返回该context的当前值。当前的context值由上层组件中距离当前组件最近的
-<MyContext.Provider>的value.prop决定
+2. 描述：接收一个Context对象，并返回该context的当前值。当前的context值由上层组件中距离当前组件最近的provider值
 ### 额外的hook
 * useReducer
+1. usereducer这个hook的封装，整个封装的方法如下：
+```
+//reducer hook封装
+    import { useState } from 'react';
+    export default useReducer function(reducer, initialState) {
+        const [state, setState] = useState(initialState);
+        function dispatch(action){
+            const nextState = reducer(state, action);
+            return setState(nextState);
+        }
+        return [state, dispatch]
+    }
+//实际例子使用
+    import  useReducer from '';
+    const initialState = {count: 0};
+    function reducer(state, action) {
+    switch (action.type) {
+        case 'increment':
+        return {count: state.count + 1};
+        case 'decrement':
+        return {count: state.count - 1};
+        default:
+        throw new Error();
+    }
+    }
+    return (
+        <div>
+            Count: {state.count}
+            <button onClick={() => dispatch({type: 'devrement'})}>-</button>
+            <button onClick={() => dispatch({type: 'increment'})}>+</button>
+        </div>
+    )
+```
+2. 使用reducer的惰性初始化： 使用init函数去返回初始值，在创建的过程中需要初始化值
+```
+    function init(initState) [
+        return { count: initState};
+    ]
+    const [ state, dispatch] = useReducer(reducer, initialCount, init);
+```
+3. 注意：如果reducer hook的返回值与当前state相同，react将跳过子组件的渲染及副作用的执行
 * useCallback
+1. 返回值：返回一个memoized回调函数，该回调函数仅在某给依赖项改变时才会更新。
+useCallBack(fn, deps)相当与useMemo(() => fn,deps)
 * useMemo
+1. 使用方式：const memoziedValue = useMemo(() => computeExpensiveValue(a,b), [a, b])
+2. 返回值：返回一个memoizedValue值,把创建函数和依赖项数组作为参数传入useMemo,仅在某个依赖项改变时
+才重新计算memoized值。
 * useRef
+1. 使用方式： const refContainer = useref(initialValue);
+2. 返回值：返回一个可ref对象，其.current属性被初始化为传入的参数(initialValue)。
 * useImperativeHandle
 * useLayoutEffect
 1. 更新时机：在浏览器执行下一次绘制前去执行
+2. 与useEffect相同，会在所有的DOM变更之后同步调用effect
 * useDebugValue
 
 
