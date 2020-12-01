@@ -10,13 +10,14 @@
 4. useEffect放在组件内部调用的原因：可以在effect中直接访问state中的变量
 5. effect返回函数：effect可选的清除机制，每个effect都可以返回一个清除函数
 6. react何时清除effect：react在组件卸载时执行清除操作
-## hook规则
+## hook中需要去注意的点
 hook需要遵循的两条规则：
 1. 只在最顶层使用hook
 * 注意：不要在循环，条件和嵌套函数中调用hook
 2. 只在react函数中调用hook(不在普通的js函数中调用hook)
 * 在react的组件中调用hook
 * 在自定义的hook中调用其他hook
+3. 在hook中定义全局变量方式，第一就是使用useState,，第二就是在函数外部,因为使用hook时，会自动将其内部的变量清零
 ### ESLint插件
 1. eslint-plugin-react-hooks的ESlint插件来强制执行上面所说的这两种规则
 2. react怎样知道state对应的是哪个useState
@@ -104,4 +105,68 @@ useCallBack(fn, deps)相当与useMemo(() => fn,deps)
 2. 与useEffect相同，会在所有的DOM变更之后同步调用effect
 * useDebugValue
 
+## useEffect去取代calss中的生命周期函数的方式
+### react中有状态组件中，其生命周期函数的各个阶段
+1. 在Mounting阶段
+    * constructor()
+    * static getDerivedStateFromProps()
+    * render()
+    * componentDidMount()
+2. Updating
+    * static getDerivedStateFormProps
+    * shouldComponentUpdate()
+    * render()
+    * getSnapshotBeforeUpdata()
+    * componentDidUpdate()   
+3. UnMouting
+    * componentWillUnmount()
 
+### 使用hook去代替生命周期函数的方式
+* componentDidMount(),在hook中需要使用下面的这种方式去取代，在useEffect中传递第二个参数，该参数为一个空数组，只会去执行一次，如下面所示
+```
+useEffect(() => {
+
+},[])
+```
+* componentDidUpdate(),有两种方式去解决
+    * 1. 在每次渲染的时候都去调用hooks，解决的方式如下面所示
+    ```
+        useEffect(() => {
+
+        })
+    ```
+    * 2. 用一个特殊变量的去触发hook,如下面所示,count指的就是这个特殊的变量，该hook触发，只会是count的值改变时
+    ```
+        useEffect(() => {
+
+        },[count])
+    ```
+* componentWillUnmount(),用hook来代替，需要去return一个callback(回调函数)，如下面的形式所示
+```
+    useEffect(() => {
+        return () => {
+            //执行的为componentWillUnmount
+        }
+    },[])
+```
+* shouldComponentUpdata(),在默认情况下，它将对props对象中的复杂对象进行浅层比较，如果想要去控制比较，可以去提供一个自定义的比较函数作为第二个参数。代替hook的方式如下所示
+```
+    import React from 'react'
+    function areEqual(prevProps, nextProps) {
+    /*
+    return true if passing nextProps to render would return
+    the same result as passing prevProps to render,
+    otherwise return false
+    */
+    }
+    const Weather = ({weather}) => {
+        return (<div>
+                <p>{weather.city}</p>
+                <p>{weather.temperature}</p>
+                {console.log('Render')}
+                </div>
+        )
+    }
+
+    export default React.memo(Weather, areEqual)
+```
